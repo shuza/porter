@@ -2,6 +2,19 @@ syntax = "proto3";
 
 package user;
 
+service UserService {
+    rpc Create (User) returns (Response) {
+    }
+    rpc Get (User) returns (Response) {
+    }
+    rpc GetAll (Empty) returns (Response) {
+    }
+    rpc Auth (User) returns (Token) {
+    }
+    rpc ValidateToken (Token) returns (Token) {
+    }
+}
+
 message User {
     string id = 1;
     string name = 2;
