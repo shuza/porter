@@ -1,7 +1,12 @@
 package db
 
-type IRepository interface {
-	Init(host string) error
+import (
+	pb "github.com/shuza/porter/user-service/proto"
+)
 
-	Close()
+type IRepository interface {
+	GetAll() ([]*pb.User, error)
+	Get(id string) (*pb.User, error)
+	GetByEmailAndPassword(user *pb.User) (*pb.User, error)
+	Create(user *pb.User) error
 }
