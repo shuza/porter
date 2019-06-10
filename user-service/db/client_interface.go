@@ -7,6 +7,6 @@ import (
 type IRepository interface {
 	GetAll() ([]*pb.User, error)
 	Get(id string) (*pb.User, error)
-	GetByEmailAndPassword(user *pb.User) (*pb.User, error)
+	GetByEmail(email string) (*pb.User, error)
 	Create(user *pb.User) error
 }

@@ -1,9 +1,25 @@
 package service
 
-import "github.com/shuza/porter/user-service/db"
+import (
+	"github.com/dgrijalva/jwt-go"
+	"github.com/shuza/porter/user-service/db"
+	pb "github.com/shuza/porter/user-service/proto"
+	"time"
+)
+
+var (
+	//	Define a secure key string used
+	//	as salt when hashing our tokens
+	key = []byte("hashingpasswordismandatory")
+)
+
+type CustomClaims struct {
+	User *pb.User
+	jwt.StandardClaims
+}
 
 type Authable interface {
-	Decode(token string) (interface{}, error)
+	Decode(token string) (*CustomClaims, error)
 	Encode(data interface{}) (string, error)
 }
 
@@ -11,10 +27,37 @@ type TokenService struct {
 	repo db.IRepository
 }
 
-func (s *TokenService) Decode(token string) (interface{}, error) {
-	return "", nil
+func (s *TokenService) Decode(tokenStr string) (*CustomClaims, error) {
+	//	Parse token
+	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+
+	//	Validate the token and return custom claim
+	if claim, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+		return claim, nil
+	}
+
+	return nil, err
 }
 
-func (s *TokenService) Encode(data interface{}) (string, error) {
-	return "", nil
+//	Encode claim into JWT
+func (s *TokenService) Encode(user *pb.User) (string, error) {
+	expireToken := time.Now().Add(72 * time.Hour).Unix()
+
+	//	Create claim
+	claim := CustomClaims{
+		user,
+		jwt.StandardClaims{
+			ExpiresAt: expireToken,
+			Issuer:    "porter.user",
+		},
+	}
+
+	//	Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+
+	//	Sign token and return
+	return token.SignedString(key)
+
 }
