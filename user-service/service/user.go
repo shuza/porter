@@ -14,6 +14,20 @@ type UserService struct {
 	tokenService Authable
 }
 
+func (s *UserService) Create(ctx context.Context, req *pb.User) (*pb.Response, error) {
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Password = string(hashedPass)
+	if err := s.repo.Create(req); err != nil {
+		return nil, err
+	}
+
+	return &pb.Response{User: req}, nil
+}
+
 func (s *UserService) Get(ctx context.Context, req *pb.User) (*pb.Response, error) {
 	user, err := s.repo.Get(req.Id)
 	if err != nil {
