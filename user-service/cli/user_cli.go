@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func amain() {
+func main() {
 	conn, err := grpc.Dial("localhost:8084", grpc.WithInsecure())
 
 	if err != nil {
@@ -17,12 +17,7 @@ func amain() {
 	defer conn.Close()
 
 	client := pb.NewUserServiceClient(conn)
-	resp, err := client.Create(context.TODO(), &pb.User{
-		Name:     "asd",
-		Email:    "asd@github.com",
-		Password: "123456",
-		Company:  "BBC",
-	})
+	resp, err := client.Create(context.TODO(), getDummyUser())
 	if err != nil {
 		log.Fatalf("Could not create: %v", err)
 	}
@@ -34,14 +29,20 @@ func amain() {
 	}
 
 	log.Println("\n\t=========	Auth	========")
-	authResponse, err := client.Auth(context.TODO(), &pb.User{
-		Email:    "asd@github.com",
-		Password: "123456",
-	})
+	authResponse, err := client.Auth(context.TODO(), getDummyUser())
 	if err != nil {
-		log.Fatalf("Could not authenticate user: asd@github.com error: %v\n", err)
+		log.Fatalf("Could not authenticate dummy user error: %v\n", err)
 	}
 
 	log.Printf("Your access token is: %s \n", authResponse.Token)
-	os.Exit(1)
+	os.Exit(0)
+}
+
+func getDummyUser() *pb.User {
+	return &pb.User{
+		Name:     "asd",
+		Email:    "asd@github.com",
+		Password: "123456",
+		Company:  "BBC",
+	}
 }
