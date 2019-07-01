@@ -27,6 +27,10 @@ type TokenService struct {
 	repo db.IRepository
 }
 
+func NewTokenService(repo db.IRepository) TokenService {
+	return TokenService{repo: repo}
+}
+
 func (s *TokenService) Decode(tokenStr string) (*CustomClaims, error) {
 	//	Parse token
 	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {

@@ -2,39 +2,45 @@ package main
 
 import (
 	"context"
+	"github.com/micro/go-micro"
+	microClient "github.com/micro/go-micro/client"
 	pb "github.com/shuza/porter/user-service/proto"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"os"
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:8084", grpc.WithInsecure())
+	srv := micro.NewService(
+		micro.Name("go.micro.srv.user-cli"),
+		micro.Version("latest"),
+	)
+	srv.Init()
 
+	client := pb.NewUserServiceClient("porter.auth", microClient.DefaultClient)
+
+	r, err := client.Create(context.TODO(), getDummyUser())
 	if err != nil {
-		log.Fatalf("Can't connect to server  :  %v", err)
+		log.Fatalf("Could not create user  Error  :   %v\n", err)
 	}
-	defer conn.Close()
+	log.Printf("Created User ID :  %v\n", r.User.Id)
 
-	client := pb.NewUserServiceClient(conn)
-	resp, err := client.Create(context.TODO(), getDummyUser())
+	getAll, err := client.GetAll(context.TODO(), &pb.Empty{})
 	if err != nil {
-		log.Fatalf("Could not create: %v", err)
+		log.Fatalf("Could not list user  Error  :   %v\n", err)
 	}
-	log.Printf("Created: %s", resp.User.Id)
 
-	respAll, err := client.GetAll(context.Background(), &pb.Empty{})
-	for _, v := range respAll.Users {
+	//	Print user list
+	for _, v := range getAll.Users {
 		log.Println(v)
 	}
 
-	log.Println("\n\t=========	Auth	========")
 	authResponse, err := client.Auth(context.TODO(), getDummyUser())
 	if err != nil {
-		log.Fatalf("Could not authenticate dummy user error: %v\n", err)
+		log.Fatalf("Could not authenticate user  Error  :   %v\n", err)
 	}
 
-	log.Printf("Your access token is: %s \n", authResponse.Token)
+	log.Printf("User token is  %v\n", authResponse.Token)
+
 	os.Exit(0)
 }
 

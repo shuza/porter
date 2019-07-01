@@ -15,6 +15,10 @@ type UserService struct {
 	tokenService Authable
 }
 
+func NewUserService(repo db.IRepository, tokenService Authable) UserService {
+	return UserService{repo: repo, tokenService: tokenService}
+}
+
 func (s *UserService) Create(ctx context.Context, req *pb.User, resp *pb.Response) error {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {

@@ -14,16 +14,19 @@ func main() {
 		panic(err)
 	}
 	defer dbConn.Close()
+
 	dbConn.AutoMigrate(&pb.User{})
-	repo := &db.UserRepository{dbConn}
-	tokenService := service.TokenService{repo}
+
+	repo := db.NewUserRepository(dbConn)
+	tokenService := service.NewTokenService(&repo)
 
 	srv := micro.NewService(
 		micro.Name("porter.auth"),
 	)
 	srv.Init()
 
-	pb.RegisterUserServiceHandler(srv.Server(), &service.UserService{repo, &tokenService})
+	userService := service.NewUserService(&repo, &tokenService)
+	pb.RegisterUserServiceHandler(srv.Server(), &userService)
 
 	log.Println("Auth service is running...")
 	if err := srv.Run(); err != nil {
