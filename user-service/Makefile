@@ -1,5 +1,5 @@
 protobuf:
-	protoc -I . --go_out=plugins=grpc:. ./proto/*.proto
+	protoc -I . --go_out=plugins=micro:. ./proto/*.proto
 
 build:
 	GOOS=linux GOARCH=amd64 go build
