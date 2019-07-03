@@ -20,11 +20,15 @@ type CustomClaims struct {
 
 type Authable interface {
 	Decode(token string) (*CustomClaims, error)
-	Encode(data interface{}) (string, error)
+	Encode(user *pb.User) (string, error)
 }
 
 type TokenService struct {
 	repo db.IRepository
+}
+
+func NewTokenService(repo db.IRepository) TokenService {
+	return TokenService{repo: repo}
 }
 
 func (s *TokenService) Decode(tokenStr string) (*CustomClaims, error) {
