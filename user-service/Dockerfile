@@ -6,4 +6,4 @@ ADD user-service /app
 
 ENV PORT=:8000
 
-CMD ["./packet-service"]
+CMD ["./user-service"]

@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	pb "github.com/shuza/porter/user-service/proto"
 	"os"
 )
