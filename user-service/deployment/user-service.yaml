@@ -24,7 +24,7 @@ spec:
             - name: MICRO_SERVER_ADDRESS
               value: ":8082"
             - name: DB_HOST
-              value: "mongodb"
+              value: "postgresql"
             - name: DB_USER
               value: "admin"
             - name: DB_NAME
@@ -33,6 +33,8 @@ spec:
               value: "123456"
             - name: APP_VERSION
               value: "v1.0"
+            - name: MICRO_REGISTRY
+              value: "kubernetes"
 
 
 ---
@@ -47,3 +49,4 @@ spec:
   ports:
     - port: 8082
       targetPort: 8082
+      protocol: TCP

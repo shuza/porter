@@ -2,21 +2,23 @@ package main
 
 import (
 	"context"
+	k8s "github.com/micro/examples/kubernetes/go/micro"
 	"github.com/micro/go-micro"
-	microClient "github.com/micro/go-micro/client"
+	"github.com/micro/go-micro/registry/consul"
 	pb "github.com/shuza/porter/user-service/proto"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func main() {
-	srv := micro.NewService(
-		micro.Name("go.micro.srv.user-cli"),
+	registry := consul.NewRegistry()
+	srv := k8s.NewService(
+		micro.Name("porter.user-cli"),
 		micro.Version("latest"),
+		micro.Registry(registry),
 	)
 	srv.Init()
 
-	client := pb.NewUserServiceClient("porter.auth", microClient.DefaultClient)
+	client := pb.NewUserServiceClient("porter.auth", srv.Client())
 
 	r, err := client.Create(context.TODO(), getDummyUser())
 	if err != nil {
@@ -41,7 +43,8 @@ func main() {
 
 	log.Printf("User token is  %v\n", authResponse.Token)
 
-	os.Exit(0)
+	sng := make(chan int)
+	<-sng
 }
 
 func getDummyUser() *pb.User {

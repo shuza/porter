@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cli
+spec:
+  selector:
+    matchLabels:
+      name: cli
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: cli
+    spec:
+      containers:
+        - name: cli-app
+          image: shuzasa/user-cli:v1.0
+          env:
+            - name: MICRO_REGISTRY
+              value: "kubernetes"
+

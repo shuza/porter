@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM golang
 
 RUN mkdir /app
 WORKDIR /app

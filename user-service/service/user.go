@@ -20,6 +20,7 @@ func NewUserService(repo db.IRepository, tokenService Authable) UserService {
 }
 
 func (s *UserService) Create(ctx context.Context, req *pb.User, resp *pb.Response) error {
+	log.Println("starting create")
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err

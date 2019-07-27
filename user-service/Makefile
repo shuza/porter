@@ -22,3 +22,12 @@ run:
 	DB_NAME=$(DB_NAME) \
 	DB_PASSWORD=$(DB_PASSWORD) \
 	go run main.go
+
+.PHONY: deploy
+deploy: docker_build
+	kubectl apply -f ./deployment/user-service.yaml
+
+.PHONY: delete
+delete:
+	kubectl delete svc user-service
+	kubectl delete deployment user-deployment

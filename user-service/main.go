@@ -1,7 +1,9 @@
 package main
 
 import (
+	k8s "github.com/micro/examples/kubernetes/go/micro"
 	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/registry/consul"
 	"github.com/shuza/porter/user-service/db"
 	pb "github.com/shuza/porter/user-service/proto"
 	"github.com/shuza/porter/user-service/service"
@@ -20,8 +22,11 @@ func main() {
 	repo := db.NewUserRepository(dbConn)
 	tokenService := service.NewTokenService(&repo)
 
-	srv := micro.NewService(
+	registry := consul.NewRegistry()
+	srv := k8s.NewService(
 		micro.Name("porter.auth"),
+		micro.Version("latest"),
+		micro.Registry(registry),
 	)
 	srv.Init()
 
