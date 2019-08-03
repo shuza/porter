@@ -4,13 +4,14 @@ import (
 	"context"
 	k8s "github.com/micro/examples/kubernetes/go/micro"
 	"github.com/micro/go-micro"
-	"github.com/micro/go-micro/registry/consul"
+	microClient "github.com/micro/go-micro/client"
+	"github.com/micro/go-plugins/registry/kubernetes"
 	pb "github.com/shuza/porter/user-service/proto"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	registry := consul.NewRegistry()
+	registry := kubernetes.NewRegistry()
 	srv := k8s.NewService(
 		micro.Name("porter.user-cli"),
 		micro.Version("latest"),
@@ -18,7 +19,13 @@ func main() {
 	)
 	srv.Init()
 
-	client := pb.NewUserServiceClient("porter.auth", srv.Client())
+	if list, err := registry.ListServices(); err != nil {
+
+	} else {
+		log.Warnf("")
+	}
+
+	client := pb.NewUserServiceClient("porter.auth", microClient.DefaultClient)
 
 	r, err := client.Create(context.TODO(), getDummyUser())
 	if err != nil {
@@ -47,10 +54,14 @@ func main() {
 	<-sng
 }
 
+func createPacket(token string) {
+
+}
+
 func getDummyUser() *pb.User {
 	return &pb.User{
-		Name:     "asd",
-		Email:    "asd@github.com",
+		Name:     "user-1",
+		Email:    "admin@github.com",
 		Password: "123456",
 		Company:  "BBC",
 	}
