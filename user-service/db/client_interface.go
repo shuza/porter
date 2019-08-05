@@ -1,27 +1,17 @@
 package db
 
 import (
-	"fmt"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	pb "github.com/shuza/porter/user-service/proto"
-	"os"
+	"user-service/model"
 )
 
 type IRepository interface {
-	GetAll() ([]*pb.User, error)
-	Get(id string) (*pb.User, error)
-	GetByEmail(email string) (*pb.User, error)
-	Create(user *pb.User) error
+	Init() error
+	GetAll() ([]model.User, error)
+	Get(id uint) (model.User, error)
+	GetByEmail(email string) (model.User, error)
+	Create(user interface{}) error
+	Close()
 }
 
-func CreateDb() (*gorm.DB, error) {
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	DBName := os.Getenv("DB_NAME")
-	password := os.Getenv("DB_PASSWORD")
-
-	connectionStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", user, password, host, DBName)
-	fmt.Println("Connection string  ::   ", connectionStr)
-	return gorm.Open("postgres", connectionStr)
-}
+var Client IRepository

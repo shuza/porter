@@ -1,25 +1,22 @@
 package main
 
 import (
-	k8s "github.com/micro/examples/kubernetes/go/micro"
-	"github.com/micro/go-micro"
-	"github.com/micro/go-plugins/registry/kubernetes"
-	"github.com/shuza/porter/user-service/db"
-	pb "github.com/shuza/porter/user-service/proto"
-	"github.com/shuza/porter/user-service/service"
-	log "github.com/sirupsen/logrus"
+	"fmt"
+	"user-service/api"
+	"user-service/db"
 )
 
 func main() {
-	dbConn, err := db.CreateDb()
-	if err != nil {
+	initDB()
+	defer db.Client.Close()
+
+	r := api.NewGinEngine()
+	fmt.Println("Box service is running on port 8083 ....")
+	if err := r.Run(":8083"); err != nil {
 		panic(err)
 	}
-	defer dbConn.Close()
 
-	dbConn.AutoMigrate(&pb.User{})
-
-	repo := db.NewUserRepository(dbConn)
+	/*repo := db.NewUserRepository(dbConn)
 	tokenService := service.NewTokenService(&repo)
 
 	registry := kubernetes.NewRegistry()
@@ -35,6 +32,13 @@ func main() {
 
 	log.Println("Auth service is running...")
 	if err := srv.Run(); err != nil {
+		panic(err)
+	}*/
+}
+
+func initDB() {
+	db.Client = &db.UserRepository{}
+	if err := db.Client.Init(); err != nil {
 		panic(err)
 	}
 }
