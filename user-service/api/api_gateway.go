@@ -9,6 +9,7 @@ func NewGinEngine() *gin.Engine {
 	routes := r.Group("/api/v1")
 	routes.POST("/user", createUser)
 	routes.POST("/login", login)
+	routes.GET("/token/validate", tokenValidation)
 
 	return r
 }
